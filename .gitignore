@@ -5,7 +5,7 @@
 # In particular, things like `mir_dump` should not be listed here; they are only
 # created during manual debugging and many people like to clean up instead of
 # having git ignore such leftovers. You can use `.git/info/exclude` to
-# configure your local ignore list.
+# configure your demo ignore list.
 
 ## File system
 .DS_Store

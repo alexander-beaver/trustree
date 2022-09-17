@@ -12,9 +12,13 @@ fn get_key_group() -> EcGroup {
     group
 }
 
+/// Gets a public key from a private key
 pub fn get_public_key(group: &EcGroup, x: &EcKey<Private>) -> Result<EcKey<Public>, ErrorStack> {
     EcKey::from_public_key(group, x.public_key())
 }
+
+
+/// Generates a new ECDSA keypair
 pub fn generate_keypair() -> (EcKey<Private>, EcKey<Public>) {
     let group = get_key_group();
     let privkey = EcKey::generate(&group).unwrap();
@@ -22,11 +26,13 @@ pub fn generate_keypair() -> (EcKey<Private>, EcKey<Public>) {
     return (privkey, pubkey);
 }
 
+/// Signs a message with a private key
 pub fn sign_data(keypair: EcKey<Private>, data: Vec<u8>) -> EcdsaSig {
     let res = EcdsaSig::sign(&*data, &keypair).unwrap();
     return res;
 }
 
+/// Verifies a signature with a public key
 pub fn verify_signature(keypair: EcKey<Public>, data: Vec<u8>, signature: EcdsaSig) -> bool {
     let res = signature.verify(&*data, &keypair).unwrap();
     return res;

@@ -1,43 +1,34 @@
+use std::collections::HashMap;
 use crate::supporting::datastore::hivemind::Hivemind;
 
-struct LocalHivemind{
-    directory: String,
+pub struct LocalHivemind{
+    store: HashMap<String, String>
 }
 impl LocalHivemind{
 
 }
-fn dir_exists(folder: String) -> bool{
-    return std::path::Path::new(&format!("{}", folder)).is_dir();
-}
+
 impl Hivemind for LocalHivemind{
-    fn init(&self) -> bool{
-        // Create all folders to the directory if they do not exist
-        if dir_exists(self.directory.clone()){
-            std::fs::create_dir_all(self.directory.clone()).expect("Unable to create directory");
-
-        }
-        return true;
-
+    fn init() -> Self {
+        return LocalHivemind{
+            store: HashMap::new()
+        };
     }
-
     fn exists(&self, key: &str) -> bool {
-        return std::path::Path::new(&format!("{}/{}", self.directory, key)).exists();
+        return self.store.contains_key(key);
     }
 
-    fn get(&self, key: &str) -> Option<String> {
-        if self.exists(key){
-            let contents = std::fs::read_to_string(&format!("{}/{}", self.directory, key)).expect("Unable to read file");
-            return Some(contents);
-        }else{
-            return None;
+    fn get(&self, key: &str) -> Option<&str>{
+        if self.exists(key) {
+            return Some(self.store.get(key).unwrap());
         }
-    }
+        return None;
 
-    fn set(&mut self, key: &str, value: &str) {
-        std::fs::write(&format!("{}/{}", self.directory, key), value).expect("Unable to write file");
     }
-
-    fn delete(&mut self, key: &str) {
-        std::fs::remove_file(&format!("{}/{}", self.directory, key)).expect("Unable to delete file");
+    fn set(&mut self, key: &str, value: &str){
+        self.store.insert(key.parse().unwrap(), value.parse().unwrap());
+    }
+    fn delete(&mut self, key: &str){
+        self.store.remove(key);
     }
 }
