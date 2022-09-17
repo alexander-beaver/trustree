@@ -15,8 +15,8 @@ impl fmt::Display for HiveKey {
 }
 pub trait Hivemind {
     fn init() -> Self;
-    fn exists(&self, key: &str) -> bool;
-    fn get(&self, key: &str) -> Option<&str>;
-    fn set(&mut self, key: &str, value: &str);
-    fn delete(&mut self, key: &str);
+    fn exists(&self, key: String) -> bool;
+    fn get(&self, key: String) -> Option<String>;
+    fn set(&mut self, key: String, value: String);
+    fn delete(&mut self, key: String);
 }

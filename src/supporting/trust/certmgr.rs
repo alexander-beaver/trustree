@@ -1,7 +1,33 @@
 use serde::{Serialize, Deserialize};
 use crate::supporting::datastore::hivemind::HiveKey;
 
+trait CertificateManager{
+    fn request_derived_certificate(&self, public_key: String) -> String;
 
+}
+
+pub struct CertificateRequest{
+    pub issued_by: String,
+    pub issued_to: String,
+
+}
+
+pub struct SignedCertificateRequest{
+    pub issued_by: String,
+    pub certificate_request: CertificateRequest,
+    pub signature: String,
+}
+
+impl SignedCertificateRequest{
+
+    /// Validate a certificate request
+    pub fn validate(&self) -> bool{
+        if self.issued_by == self.certificate_request.issued_by{
+            return true;
+        }
+        return false;
+    }
+}
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Certificate{
     /// The ID of the certificate
@@ -38,6 +64,8 @@ pub struct IssuedCertificate{
     pub signature: String,
 }
 
+
+/// Generates a root certificate given a private key and a public key
 pub fn generate_root_certificate(private_key_pem: String, public_key_pem: String) -> Certificate{
     let root_cert = Certificate{
         id: format!("{}/root",HiveKey::Cert).to_string(),
