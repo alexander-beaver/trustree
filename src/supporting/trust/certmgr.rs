@@ -1,15 +1,10 @@
+use std::fmt;
 use serde::{Serialize, Deserialize};
 use crate::supporting::datastore::hivemind::HiveKey;
-
-trait CertificateManager{
-    fn request_derived_certificate(&self, public_key: String) -> String;
-
-}
 
 pub struct CertificateRequest{
     pub issued_by: String,
     pub issued_to: String,
-
 }
 
 pub struct SignedCertificateRequest{
@@ -76,5 +71,37 @@ pub fn generate_root_certificate(private_key_pem: String, public_key_pem: String
         timestamp_expires: 1893502800, // 2030-01-01
     };
     return root_cert;
+
+}
+
+/// The valid responses when a certificate issuance request is submitted to the Certificate Manager
+pub enum CertificateIssuanceResponseType{
+    Unknown,
+    Ok,
+    InvalidRequest,
+    InvalidChainOfTrust,
+}
+
+impl fmt::Display for CertificateIssuanceResponseType{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            CertificateIssuanceResponseType::Unknown => write!(f, "UNKNOWN"),
+            CertificateIssuanceResponseType::Ok => write!(f, "OK"),
+            CertificateIssuanceResponseType::InvalidRequest => write!(f, "INVALID_REQUEST"),
+            CertificateIssuanceResponseType::InvalidChainOfTrust => write!(f, "INVALID_CHAIN_OF_TRUST"),
+        }
+    }
+}
+
+/// A response to a certificate issuance request
+pub struct CertificateIssuanceResponse{
+    pub response_type: CertificateIssuanceResponseType,
+    pub certificate: String,
+}
+
+/// A connection to a Certificate Manager
+pub trait CertificateManagerConn {
+    /// Request a certificate from the Certificate Manager
+    fn request_certificate(&self, request: SignedCertificateRequest) -> CertificateIssuanceResponse;
 
 }
