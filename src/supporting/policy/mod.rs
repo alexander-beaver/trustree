@@ -1,3 +1,5 @@
+pub mod powerpolicy;
+
 use std::fmt;
 use crate::supporting::trust::ScoredSecurityPolicy;
 

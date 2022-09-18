@@ -27,6 +27,8 @@ impl CertificateManagerConn for LocalCertMgr {
                     .collect();
             }
         }
+
+        ephemeral_name = format!("{}/CERT/{}", hivemind.get_hivemind_path(), ephemeral_name);
         if hivemind.request_issuance(request.clone()) {
             return CertificateIssuanceResponse {
                 response_type: CertificateIssuanceResponseType::Ok,

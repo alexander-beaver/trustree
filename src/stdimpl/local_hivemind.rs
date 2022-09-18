@@ -40,4 +40,7 @@ impl Hivemind for LocalHivemind{
     fn get_hivemind_path(&self) -> String {
         return "$".to_string();
     }
+    fn get_validators(&self) -> Vec<Box<dyn PolicyValidator>> {
+        return Vec::new();
+    }
 }

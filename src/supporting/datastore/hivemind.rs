@@ -1,16 +1,17 @@
 use std::fmt;
+use crate::supporting::policy::powerpolicy::PolicyValidator;
 use crate::supporting::trust::certmgr::SignedCertificateRequest;
 
 pub enum HiveKey {
     Cert,
-    Perm
+    Template
 }
 
 impl fmt::Display for HiveKey {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             HiveKey::Cert => write!(f, "CERT"),
-            HiveKey::Perm => write!(f, "PERM"),
+            HiveKey::Template => write!(f, "TEMPLATE"),
         }
     }
 }
@@ -31,4 +32,6 @@ pub trait Hivemind {
     fn request_issuance(&self, req: SignedCertificateRequest) -> bool;
 
     fn get_hivemind_path(&self) -> String;
+
+    fn get_validators(&self) -> Vec<Box<dyn PolicyValidator>>;
 }
