@@ -26,22 +26,7 @@ pub struct SignedCertificateRequest{
 }
 
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Certificate{
-    /// The ID of the certificate
-    pub id: String,
-    /// The IDs of the certificate chain that issued this certificate
-    pub issued_by: Vec<String>,
-    /// The IDs of the certificates that this certificate issues
-    pub issues: Vec<String>,
-    /// The public key of the certificate
-    pub public_key: String,
 
-
-    /// The timestamp of when the certificate expires
-    pub timestamp_expires: u64,
-
-}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PrivateCertificate{
@@ -51,7 +36,7 @@ pub struct PrivateCertificate{
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 /// A certificate that has been issued by the hivemind and certificate manager
-pub struct IssuedCertificate{
+pub struct Certificate {
     /// The ID of the certificate
     pub id: String,
     /// The IDs of the certificate chain that issued this certificate
@@ -68,23 +53,17 @@ pub struct IssuedCertificate{
     pub signature: String,
 }
 
-pub fn issued_certificate_to_certificate(issued_certificate: IssuedCertificate) -> Certificate{
-    Certificate{
-        id: issued_certificate.id,
-        issued_by: issued_certificate.issued_by,
-        issues: vec![],
-        public_key: issued_certificate.public_key,
-        timestamp_expires: issued_certificate.timestamp_expires,
-    }
-}
+
 /// Generates a root certificate given a private key and a public key
 pub fn generate_root_certificate(hivemind_origin: String,private_key_pem: String, public_key_pem: String) -> PrivateCertificate{
     let root_cert = Certificate{
         id: format!("{}/{}/root", hivemind_origin, HiveKey::Cert).to_string(),
         issued_by: vec![],
-        issues: vec![],
         public_key: public_key_pem,
+        timestamp_issued: chrono::Utc::now().timestamp() as u64,
         timestamp_expires: 1893502800, // 2030-01-01
+        data: "".to_string(),
+        signature: "".to_string()
     };
 
     return PrivateCertificate{
@@ -122,7 +101,7 @@ impl fmt::Display for CertificateIssuanceResponseType{
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CertificateIssuanceResponse{
     pub response_type: CertificateIssuanceResponseType,
-    pub certificate: Option<IssuedCertificate>,
+    pub certificate: Option<Certificate>,
 }
 
 /// A connection to a Certificate Manager

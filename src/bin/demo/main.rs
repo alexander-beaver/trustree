@@ -8,7 +8,7 @@ use tt_rs::crypto::ecdsa::{generate_keypair, get_pem_from_private_key, get_pem_f
 use tt_rs::supporting::ux::default_prints::print_copyright;
 use tt_rs::stdimpl::local_hivemind::LocalHivemind;
 use tt_rs::supporting::datastore::hivemind::{HiveKey, Hivemind};
-use tt_rs::supporting::trust::certmgr::{CertificateManagerConn, CertificateRequest, issued_certificate_to_certificate, PrivateCertificate, SignedCertificateRequest};
+use tt_rs::supporting::trust::certmgr::{CertificateManagerConn, CertificateRequest, PrivateCertificate, SignedCertificateRequest};
 
 fn main() {
     print_copyright();
@@ -26,20 +26,22 @@ fn main() {
 
     let (crt_1_private, crt_1_public) = generate_keypair();
     let res = certmgr.request_certificate(
-    generate_signed_certificate_request(root_cert.clone(), get_pem_from_public_key(crt_1_public),"".to_string(), vec![], 60*60), &mut hivemind);
+    generate_signed_certificate_request(root_cert.clone(), get_pem_from_public_key(crt_1_public.clone()),"".to_string(), vec![], 60*60), &mut hivemind);
 
     println!("{:?}", res);
 
     let cert1 = res.certificate.unwrap();
 
     let cert1_private_cert = PrivateCertificate{
-        private_key: get_pem_from_private_key(crt_1_private),
-        certificate: issued_certificate_to_certificate(cert1.clone())
+        private_key: get_pem_from_private_key(crt_1_private.clone()),
+        certificate: cert1.clone()
     };
 
     let (crt_2_private, crt_2_public) = generate_keypair();
     let res = certmgr.request_certificate(
     generate_signed_certificate_request(cert1_private_cert, get_pem_from_public_key(crt_2_public),"".to_string(), vec![], 60*60), &mut hivemind);
+
+    println!("{:?}", res);
 
 
 }

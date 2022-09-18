@@ -1,5 +1,5 @@
 use crate::supporting::datastore::hivemind::Hivemind;
-use crate::supporting::trust::certmgr::{CertificateIssuanceResponse, CertificateIssuanceResponseType, CertificateManagerConn, IssuedCertificate, SignedCertificateRequest};
+use crate::supporting::trust::certmgr::{CertificateIssuanceResponse, CertificateIssuanceResponseType, CertificateManagerConn, Certificate, SignedCertificateRequest};
 use rand::{thread_rng, Rng};
 use rand::distributions::Alphanumeric;
 use chrono;
@@ -32,7 +32,7 @@ impl CertificateManagerConn for LocalCertMgr {
         if hivemind.request_issuance(request.clone()) {
             return CertificateIssuanceResponse {
                 response_type: CertificateIssuanceResponseType::Ok,
-                certificate: Some(IssuedCertificate {
+                certificate: Some(Certificate {
                     id: ephemeral_name,
                     issued_by: request.clone().certificate_request.issued_by,
                     public_key: request.clone().associated_public_key,

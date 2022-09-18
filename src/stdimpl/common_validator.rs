@@ -80,6 +80,7 @@ impl PolicyValidator for ChainOfTrustValidator {
             }
         }
         if request.clone().certificate_request.issued_by[0] == "$/CERT/root" {
+            println!("Valid chain of trust");
             return PolicyValidatorResponse {
                 vote: Valid,
                 confidence: 1000,
