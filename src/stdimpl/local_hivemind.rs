@@ -1,19 +1,19 @@
 use std::collections::HashMap;
+use crate::stdimpl::common_validator::{ChainOfTrustValidator, TemplateValidator};
 use crate::supporting::datastore::hivemind::Hivemind;
+use crate::supporting::policy::powerpolicy::PolicyValidator;
 use crate::supporting::trust::certmgr::SignedCertificateRequest;
 
 pub struct LocalHivemind{
-    store: HashMap<String, String>
+    pub store: HashMap<String, String>
 }
 impl LocalHivemind{
 
 }
 
 impl Hivemind for LocalHivemind{
-    fn init() -> Self {
-        return LocalHivemind{
-            store: HashMap::new()
-        };
+    fn init(&self) -> bool {
+        return true;
     }
     fn exists(&self, key: String) -> bool {
         return self.store.contains_key(key.as_str());
@@ -41,6 +41,6 @@ impl Hivemind for LocalHivemind{
         return "$".to_string();
     }
     fn get_validators(&self) -> Vec<Box<dyn PolicyValidator>> {
-        return Vec::new();
+        return vec![Box::new(TemplateValidator{}), Box::new(ChainOfTrustValidator{})];
     }
 }

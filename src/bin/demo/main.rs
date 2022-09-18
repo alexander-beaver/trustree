@@ -1,6 +1,7 @@
 extern crate core;
 
 
+use std::collections::HashMap;
 use openssl::base64;
 use tt_rs::crypto::ecdsa::{generate_keypair, sign_data};
 use tt_rs::supporting::ux::default_prints::print_copyright;
@@ -14,7 +15,8 @@ fn main() {
     let root_private_pem = base64::encode_block(root_private_key.private_key_to_pem().unwrap().as_slice());
     let root_public_pem = base64::encode_block(root_public_key.public_key_to_pem().unwrap().as_slice());
 
-    let mut hivemind = LocalHivemind::init();
+    let mut hivemind = LocalHivemind{store: HashMap::new()};
+    LocalHivemind::init(&hivemind);
 
     let root_cert = tt_rs::supporting::trust::certmgr::generate_root_certificate(String::from("$"),root_private_pem, root_public_pem);
 

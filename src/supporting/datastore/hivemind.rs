@@ -19,7 +19,7 @@ impl fmt::Display for HiveKey {
 /// Standard implementation for a Hivemind connection
 pub trait Hivemind {
     /// Initialize the Hivemind connection
-    fn init() -> Self;
+    fn init(&self) -> bool;
     /// Check if a key exists in the Hivemind
     fn exists(&self, key: String) -> bool;
     /// Get a value from the Hivemind

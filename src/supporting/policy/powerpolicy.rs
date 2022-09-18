@@ -1,6 +1,8 @@
 use core::fmt;
 use crate::supporting::datastore::hivemind::Hivemind;
 use crate::supporting::trust::certmgr::SignedCertificateRequest;
+use serde::{Serialize, Deserialize};
+
 
 /// The ways that a validator can vote on a specific request
 pub enum PolicyValidatorVote{
@@ -46,7 +48,7 @@ pub struct PolicyValidatorResponse{
     pub confidence: u32
 }
 pub trait PolicyValidator{
-    fn validate<H:Hivemind>(&self, request: SignedCertificateRequest, hivemind: &H) -> PolicyValidatorResponse;
+    fn validate(&self, request: SignedCertificateRequest, hivemind: Box<dyn Hivemind>) -> PolicyValidatorResponse;
 
 }
 
@@ -66,4 +68,15 @@ pub enum PolicyTemplateValidationMethod{
     /// **Note: Your string must be a valid u32.** Otherwise, the system will vote invalid.
     SecurityDegree,
 
+}
+
+pub struct PolicyTemplateValidationDomain{
+    /// The key that the validator will look for in the template
+    pub key: String,
+
+    /// The value that the validator will look for in the template
+    pub value: String,
+
+    /// The method that the validator will use to validate the template
+    pub validation_method: PolicyTemplateValidationMethod,
 }
