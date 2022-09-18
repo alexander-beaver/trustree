@@ -1,6 +1,5 @@
 extern crate core;
 
-
 use openssl::base64;
 use tt_rs::crypto::ecdsa::{generate_keypair, sign_data};
 use tt_rs::supporting::ux::default_prints::print_copyright;

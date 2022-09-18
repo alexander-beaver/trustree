@@ -1,10 +1,10 @@
-use std::fmt;
 use crate::supporting::policy::powerpolicy::PolicyValidator;
 use crate::supporting::trust::certmgr::SignedCertificateRequest;
+use std::fmt;
 
 pub enum HiveKey {
     Cert,
-    Template
+    Template,
 }
 
 impl fmt::Display for HiveKey {

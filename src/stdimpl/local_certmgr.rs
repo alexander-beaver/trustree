@@ -1,13 +1,18 @@
 use crate::supporting::datastore::hivemind::Hivemind;
-use crate::supporting::trust::certmgr::{CertificateIssuanceResponse, CertificateIssuanceResponseType, CertificateManagerConn, Certificate, SignedCertificateRequest};
-use rand::{thread_rng, Rng};
-use rand::distributions::Alphanumeric;
+use crate::supporting::trust::certmgr::{
+    Certificate, CertificateIssuanceResponse, CertificateIssuanceResponseType,
+    CertificateManagerConn, SignedCertificateRequest,
+};
 use chrono;
-pub struct LocalCertMgr{
-
-}
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
+pub struct LocalCertMgr {}
 impl CertificateManagerConn for LocalCertMgr {
-    fn request_certificate<H: Hivemind>(&self, request: SignedCertificateRequest, hivemind: &mut H) -> CertificateIssuanceResponse {
+    fn request_certificate<H: Hivemind>(
+        &self,
+        request: SignedCertificateRequest,
+        hivemind: &mut H,
+    ) -> CertificateIssuanceResponse {
         let mut ephemeral_name: String = thread_rng()
             .sample_iter(&Alphanumeric)
             .take(64)
@@ -15,11 +20,11 @@ impl CertificateManagerConn for LocalCertMgr {
             .collect();
 
         let mut run = true;
-        while run{
-            if !hivemind.exists(ephemeral_name.clone()){
+        while run {
+            if !hivemind.exists(ephemeral_name.clone()) {
                 run = false;
                 break;
-            }else{
+            } else {
                 ephemeral_name = thread_rng()
                     .sample_iter(&Alphanumeric)
                     .take(64)
@@ -40,13 +45,13 @@ impl CertificateManagerConn for LocalCertMgr {
                     timestamp_expires: request.clone().certificate_request.timestamp_expires,
                     data: serde_json::to_string(&request.clone().certificate_request).unwrap(),
                     signature: request.signature,
-                })
+                }),
             };
         }
 
         return CertificateIssuanceResponse {
             response_type: CertificateIssuanceResponseType::Unknown,
-            certificate: None
+            certificate: None,
         };
     }
 }

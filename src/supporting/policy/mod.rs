@@ -1,9 +1,9 @@
 pub mod powerpolicy;
 
-use std::fmt;
 use crate::supporting::trust::ScoredSecurityPolicy;
+use std::fmt;
 
-pub enum ScopeType{
+pub enum ScopeType {
     /// Evaluate scope on direct string comparison
     Equals,
     /// Evaluate scope on regex match
@@ -11,7 +11,7 @@ pub enum ScopeType{
     /// Evaluate scope on all scopes
     All,
 }
-impl fmt::Display for ScopeType{
+impl fmt::Display for ScopeType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             ScopeType::Equals => write!(f, "Equals"),
@@ -22,7 +22,7 @@ impl fmt::Display for ScopeType{
 }
 
 /// Evaluate the score of a security policy's scope type
-impl ScoredSecurityPolicy for ScopeType{
+impl ScoredSecurityPolicy for ScopeType {
     fn score(&self) -> u32 {
         match *self {
             ScopeType::Equals => 1000,
@@ -31,7 +31,7 @@ impl ScoredSecurityPolicy for ScopeType{
         }
     }
 }
-pub struct PolicyScope{
+pub struct PolicyScope {
     pub name: String,
     pub scope_type: ScopeType,
     pub scope_members: Vec<String>,

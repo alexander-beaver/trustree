@@ -1,11 +1,10 @@
-use core::fmt;
 use crate::supporting::datastore::hivemind::Hivemind;
 use crate::supporting::trust::certmgr::SignedCertificateRequest;
-use serde::{Serialize, Deserialize};
-
+use core::fmt;
+use serde::{Deserialize, Serialize};
 
 /// The ways that a validator can vote on a specific request
-pub enum PolicyValidatorVote{
+pub enum PolicyValidatorVote {
     /// The validator believes that the request is valid
     Valid,
     /// The validator believes that the request is invalid
@@ -16,13 +15,13 @@ pub enum PolicyValidatorVote{
     Unknown,
 }
 
-impl PolicyValidatorVote{
+impl PolicyValidatorVote {
     /// Convert a PolicyValidatorVote to a boolean
     /// *true* if it is valid
     /// *false* if it is not valid
-    pub fn to_bool(&self) -> bool{
-        match self{
-            PolicyValidatorVote::Valid   => true,
+    pub fn to_bool(&self) -> bool {
+        match self {
+            PolicyValidatorVote::Valid => true,
             PolicyValidatorVote::Invalid => false,
             PolicyValidatorVote::Abstain => false,
             PolicyValidatorVote::Unknown => false,
@@ -32,7 +31,7 @@ impl PolicyValidatorVote{
 impl fmt::Display for PolicyValidatorVote {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            PolicyValidatorVote::Valid   => write!(f, "VALID"),
+            PolicyValidatorVote::Valid => write!(f, "VALID"),
             PolicyValidatorVote::Invalid => write!(f, "INVALID"),
             PolicyValidatorVote::Abstain => write!(f, "ABSTAIN"),
             PolicyValidatorVote::Unknown => write!(f, "UNKNOWN"),
@@ -40,24 +39,25 @@ impl fmt::Display for PolicyValidatorVote {
     }
 }
 
-pub struct PolicyValidatorResponse{
+pub struct PolicyValidatorResponse {
     /// Whether the validators believes that the action is valid
     pub vote: PolicyValidatorVote,
 
     /// The magnitude of the confidence that the validator has in its decision
-    pub confidence: u32
+    pub confidence: u32,
 }
-pub trait PolicyValidator{
-    fn validate(&self, request: SignedCertificateRequest, hivemind: Box<dyn Hivemind>) -> PolicyValidatorResponse;
-
+pub trait PolicyValidator {
+    fn validate(
+        &self,
+        request: SignedCertificateRequest,
+        hivemind: Box<dyn Hivemind>,
+    ) -> PolicyValidatorResponse;
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct PolicyTemplate{
+pub struct PolicyTemplate {}
 
-}
-
-pub enum PolicyTemplateValidationMethod{
+pub enum PolicyTemplateValidationMethod {
     /// It must match direct string equality
     Exact,
     /// It must match a regex
@@ -67,10 +67,9 @@ pub enum PolicyTemplateValidationMethod{
     ///
     /// **Note: Your string must be a valid u32.** Otherwise, the system will vote invalid.
     SecurityDegree,
-
 }
 
-pub struct PolicyTemplateValidationDomain{
+pub struct PolicyTemplateValidationDomain {
     /// The key that the validator will look for in the template
     pub key: String,
 

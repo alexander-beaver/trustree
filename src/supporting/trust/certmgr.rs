@@ -1,11 +1,11 @@
-use std::fmt;
+use crate::supporting::datastore::hivemind::{HiveKey, Hivemind};
 use openssl::ec::EcKey;
 use openssl::pkey::Private;
-use serde::{Serialize, Deserialize};
-use crate::supporting::datastore::hivemind::{HiveKey, Hivemind};
+use serde::{Deserialize, Serialize};
+use std::fmt;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct CertificateRequest{
+pub struct CertificateRequest {
     /// The issuer of this certificate
     ///
     /// This is a list of HiveKeys that are used to form the trust
@@ -18,18 +18,15 @@ pub struct CertificateRequest{
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct SignedCertificateRequest{
+pub struct SignedCertificateRequest {
     pub requested_by: String,
     pub certificate_request: CertificateRequest,
     pub signature: String,
     pub associated_public_key: String,
 }
 
-
-
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct PrivateCertificate{
+pub struct PrivateCertificate {
     pub private_key: String,
     pub certificate: Certificate,
 }
@@ -53,29 +50,31 @@ pub struct Certificate {
     pub signature: String,
 }
 
-
 /// Generates a root certificate given a private key and a public key
-pub fn generate_root_certificate(hivemind_origin: String,private_key_pem: String, public_key_pem: String) -> PrivateCertificate{
-    let root_cert = Certificate{
+pub fn generate_root_certificate(
+    hivemind_origin: String,
+    private_key_pem: String,
+    public_key_pem: String,
+) -> PrivateCertificate {
+    let root_cert = Certificate {
         id: format!("{}/{}/root", hivemind_origin, HiveKey::Cert).to_string(),
         issued_by: vec![],
         public_key: public_key_pem,
         timestamp_issued: chrono::Utc::now().timestamp() as u64,
         timestamp_expires: 1893502800, // 2030-01-01
         data: "".to_string(),
-        signature: "".to_string()
+        signature: "".to_string(),
     };
 
-    return PrivateCertificate{
+    return PrivateCertificate {
         private_key: private_key_pem,
         certificate: root_cert,
     };
-
 }
 
 /// The valid responses when a certificate issuance request is submitted to the Certificate Manager
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum CertificateIssuanceResponseType{
+pub enum CertificateIssuanceResponseType {
     /// The certificate issuance failed for an unknown reason
     Unknown,
     /// The certificate issuance completed successfully
@@ -86,20 +85,22 @@ pub enum CertificateIssuanceResponseType{
     InvalidChainOfTrust,
 }
 
-impl fmt::Display for CertificateIssuanceResponseType{
+impl fmt::Display for CertificateIssuanceResponseType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             CertificateIssuanceResponseType::Unknown => write!(f, "UNKNOWN"),
             CertificateIssuanceResponseType::Ok => write!(f, "OK"),
             CertificateIssuanceResponseType::InvalidRequest => write!(f, "INVALID_REQUEST"),
-            CertificateIssuanceResponseType::InvalidChainOfTrust => write!(f, "INVALID_CHAIN_OF_TRUST"),
+            CertificateIssuanceResponseType::InvalidChainOfTrust => {
+                write!(f, "INVALID_CHAIN_OF_TRUST")
+            }
         }
     }
 }
 
 /// A response to a certificate issuance request
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct CertificateIssuanceResponse{
+pub struct CertificateIssuanceResponse {
     pub response_type: CertificateIssuanceResponseType,
     pub certificate: Option<Certificate>,
 }
@@ -107,6 +108,9 @@ pub struct CertificateIssuanceResponse{
 /// A connection to a Certificate Manager
 pub trait CertificateManagerConn {
     /// Request a certificate from the Certificate Manager
-    fn request_certificate<H:Hivemind>(&self, request: SignedCertificateRequest, hivemind: &mut H) -> CertificateIssuanceResponse;
-
+    fn request_certificate<H: Hivemind>(
+        &self,
+        request: SignedCertificateRequest,
+        hivemind: &mut H,
+    ) -> CertificateIssuanceResponse;
 }
