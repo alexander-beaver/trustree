@@ -8,11 +8,25 @@ pub struct LocalCertMgr{
 }
 impl CertificateManagerConn for LocalCertMgr {
     fn request_certificate<H: Hivemind>(&self, request: SignedCertificateRequest, hivemind: H) -> CertificateIssuanceResponse {
-        let ephemeral_name: String = thread_rng()
+        let mut ephemeral_name: String = thread_rng()
             .sample_iter(&Alphanumeric)
             .take(64)
             .map(char::from)
             .collect();
+
+        let mut run = true;
+        while run{
+            if !hivemind.exists(ephemeral_name.clone()){
+                run = false;
+                break;
+            }else{
+                ephemeral_name = thread_rng()
+                    .sample_iter(&Alphanumeric)
+                    .take(64)
+                    .map(char::from)
+                    .collect();
+            }
+        }
 
         if hivemind.request_issuance(request.clone()) {
             return CertificateIssuanceResponse {
@@ -23,8 +37,8 @@ impl CertificateManagerConn for LocalCertMgr {
                     public_key: request.clone().associated_public_key,
                     timestamp_issued: chrono::Utc::now().timestamp() as u64,
                     timestamp_expires: request.clone().certificate_request.timestamp_expires,
-                    data: "".to_string(),
-                    signature: "".to_string()
+                    data: serde_json::to_string(&request.clone().certificate_request).unwrap(),
+                    signature: request.signature,
                 })
             };
         }

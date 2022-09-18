@@ -34,6 +34,6 @@ impl Hivemind for LocalHivemind{
     }
 
     fn request_issuance(&self, req: SignedCertificateRequest) -> bool {
-        return false;
+        return true;
     }
 }
