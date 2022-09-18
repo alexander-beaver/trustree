@@ -17,6 +17,18 @@ pub struct CertificateRequest {
     pub timestamp_expires: u64,
 }
 
+impl CertificateRequest{
+    pub fn from_certificate(certificate: Certificate) -> CertificateRequest{
+        CertificateRequest{
+            issued_by: certificate.issued_by,
+            issued_to: certificate.issued_to,
+            template: certificate.template,
+            scope: certificate.scope,
+            timestamp_expires: certificate.timestamp_expires,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SignedCertificateRequest {
     pub requested_by: String,
@@ -38,6 +50,8 @@ pub struct Certificate {
     pub id: String,
     /// The IDs of the certificate chain that issued this certificate
     pub issued_by: Vec<String>,
+    /// The ID of the endpoint that this certificate is issued to
+    pub issued_to: String,
     /// The public key of the certificate
     pub public_key: String,
     /// The timestamp of when the certificate was issued
@@ -48,6 +62,19 @@ pub struct Certificate {
     pub data: String,
     /// The signature of the data
     pub signature: String,
+    /// The template that was used to generate this certificate
+    pub template: String,
+    /// The scope of the certificate
+    pub scope: Vec<String>,
+}
+
+impl Certificate {
+    pub fn to_json(&self) -> String {
+        serde_json::to_string(&self).unwrap()
+    }
+    pub fn from_json(json: String) -> Certificate {
+        serde_json::from_str(&json).unwrap()
+    }
 }
 
 /// Generates a root certificate given a private key and a public key
@@ -64,6 +91,9 @@ pub fn generate_root_certificate(
         timestamp_expires: 1893502800, // 2030-01-01
         data: "".to_string(),
         signature: "".to_string(),
+        template: "root".to_string(),
+        scope: vec![],
+        issued_to: "*".to_string(),
     };
 
     return PrivateCertificate {

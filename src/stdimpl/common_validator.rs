@@ -5,13 +5,13 @@ use openssl::base64;
 use openssl::ec::EcKey;
 use openssl::ecdsa::EcdsaSig;
 
-use crate::crypto::ecdsa::verify_signature;
+use crate::crypto::ecdsa::{convert_pem_to_public_key, ecdsa_from_string, verify_signature};
 use crate::supporting::datastore::hivemind::Hivemind;
 use crate::supporting::policy::powerpolicy::PolicyValidatorVote::{Abstain, Invalid, Valid};
 use crate::supporting::policy::powerpolicy::{
     PolicyTemplate, PolicyValidator, PolicyValidatorResponse,
 };
-use crate::supporting::trust::certmgr::{Certificate, SignedCertificateRequest};
+use crate::supporting::trust::certmgr::{Certificate, CertificateRequest, SignedCertificateRequest};
 
 pub struct TemplateValidator {}
 
@@ -19,7 +19,7 @@ impl PolicyValidator for TemplateValidator {
     fn validate(
         &self,
         request: SignedCertificateRequest,
-        hivemind: Box<dyn Hivemind>,
+        hivemind: &Hivemind,
     ) -> PolicyValidatorResponse {
         if request.certificate_request.template == "" {
             return PolicyValidatorResponse {
@@ -52,7 +52,7 @@ impl PolicyValidator for ChainOfTrustValidator {
     fn validate(
         &self,
         request: SignedCertificateRequest,
-        hivemind: Box<dyn Hivemind>,
+        hivemind: &Hivemind,
     ) -> PolicyValidatorResponse {
         let mut keys = request.clone().certificate_request.issued_by;
         keys.reverse();
@@ -72,20 +72,27 @@ impl PolicyValidator for ChainOfTrustValidator {
             let cert = cert.unwrap();
 
             let parsed_cert: Certificate = serde_json::from_str(cert.as_str()).unwrap();
+            if parsed_cert.id == "$/CERT/root"{
+                // TODO Implement boottime protection
+                return PolicyValidatorResponse {
+                    vote: Valid,
+                    confidence: 1000,
+                };
+            }
+            let issuer = parsed_cert.issued_by.last().unwrap().clone();
+            let issuer_cert = hivemind.get(issuer.clone());
+            if issuer_cert.is_none() {
+                return PolicyValidatorResponse {
+                    vote: Invalid,
+                    confidence: 1000,
+                };
+            }
+            let issuer_cert = issuer_cert.unwrap();
+            let issuer_cert = Certificate::from_json(issuer_cert);
             if !verify_signature(
-                EcKey::public_key_from_pem(
-                    base64::decode_block(parsed_cert.public_key.as_str())
-                        .unwrap()
-                        .as_slice(),
-                )
-                .unwrap(),
-                cert.as_bytes().to_vec(),
-                EcdsaSig::from_der(
-                    base64::decode_block(request.signature.as_str())
-                        .unwrap()
-                        .as_slice(),
-                )
-                .unwrap(),
+                convert_pem_to_public_key(issuer_cert.public_key.clone()),
+                serde_json::to_string(&CertificateRequest::from_certificate(parsed_cert.clone())).unwrap().as_bytes().to_vec(),
+                ecdsa_from_string(parsed_cert.signature.clone()),
             ) {
                 return PolicyValidatorResponse {
                     vote: Invalid,

@@ -1,4 +1,4 @@
-use crate::crypto::ecdsa::{convert_pem_to_private_key, sign_data};
+use crate::crypto::ecdsa::{convert_pem_to_private_key, ecdsa_to_string, sign_data};
 use crate::supporting::trust::certmgr::{
     CertificateRequest, PrivateCertificate, SignedCertificateRequest,
 };
@@ -38,7 +38,7 @@ pub fn generate_signed_certificate_request(
         requested_by: issuing_certificate.certificate.id,
 
         certificate_request: cr.clone(),
-        signature: base64::encode_block(signature.to_der().unwrap().as_slice()),
+        signature: ecdsa_to_string(signature),
         associated_public_key: public_key,
     }
 }

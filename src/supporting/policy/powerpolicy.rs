@@ -50,7 +50,7 @@ pub trait PolicyValidator {
     fn validate(
         &self,
         request: SignedCertificateRequest,
-        hivemind: Box<dyn Hivemind>,
+        hivemind: &Hivemind,
     ) -> PolicyValidatorResponse;
 }
 

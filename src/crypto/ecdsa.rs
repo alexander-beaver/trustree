@@ -30,9 +30,16 @@ pub fn sign_data(keypair: EcKey<Private>, data: Vec<u8>) -> EcdsaSig {
     return res;
 }
 
+pub fn ecdsa_to_string(sig: EcdsaSig) -> String {
+    return base64::encode_block(sig.to_der().unwrap().as_slice());
+}
+pub fn ecdsa_from_string(sig: String) -> EcdsaSig {
+    return EcdsaSig::from_der(&base64::decode_block(sig.as_str()).unwrap()).unwrap();
+}
+
 /// Verifies a signature with a public key
 pub fn verify_signature(keypair: EcKey<Public>, data: Vec<u8>, signature: EcdsaSig) -> bool {
-    let res = signature.verify(&*data, &keypair).unwrap();
+    let res = signature.verify(data.as_slice(), &keypair).unwrap();
     return res;
 }
 
