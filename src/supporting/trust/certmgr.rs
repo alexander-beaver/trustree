@@ -1,4 +1,6 @@
 use std::fmt;
+use openssl::ec::EcKey;
+use openssl::pkey::Private;
 use serde::{Serialize, Deserialize};
 use crate::supporting::datastore::hivemind::{HiveKey, Hivemind};
 
@@ -23,16 +25,7 @@ pub struct SignedCertificateRequest{
     pub associated_public_key: String,
 }
 
-impl SignedCertificateRequest{
 
-    /// Validate a certificate request
-    pub fn validate(&self) -> bool{
-        if self.requested_by == self.certificate_request.issued_by[0]{
-            return true;
-        }
-        return false;
-    }
-}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Certificate{
     /// The ID of the certificate
@@ -43,8 +36,7 @@ pub struct Certificate{
     pub issues: Vec<String>,
     /// The public key of the certificate
     pub public_key: String,
-    /// The private key of the certificate
-    pub private_key: String,
+
 
     /// The timestamp of when the certificate expires
     pub timestamp_expires: u64,
@@ -52,6 +44,13 @@ pub struct Certificate{
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PrivateCertificate{
+    pub private_key: String,
+    pub certificate: Certificate,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+/// A certificate that has been issued by the hivemind and certificate manager
 pub struct IssuedCertificate{
     /// The ID of the certificate
     pub id: String,
@@ -71,16 +70,19 @@ pub struct IssuedCertificate{
 
 
 /// Generates a root certificate given a private key and a public key
-pub fn generate_root_certificate(hivemind_origin: String,private_key_pem: String, public_key_pem: String) -> Certificate{
+pub fn generate_root_certificate(hivemind_origin: String,private_key_pem: String, public_key_pem: String) -> PrivateCertificate{
     let root_cert = Certificate{
         id: format!("{}/{}/root", hivemind_origin, HiveKey::Cert).to_string(),
         issued_by: vec![],
         issues: vec![],
         public_key: public_key_pem,
-        private_key: private_key_pem,
         timestamp_expires: 1893502800, // 2030-01-01
     };
-    return root_cert;
+
+    return PrivateCertificate{
+        private_key: private_key_pem,
+        certificate: root_cert,
+    };
 
 }
 

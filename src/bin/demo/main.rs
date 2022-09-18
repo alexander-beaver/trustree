@@ -21,7 +21,7 @@ fn main() {
     let root_cert = tt_rs::supporting::trust::certmgr::generate_root_certificate(String::from("$"),root_private_pem, root_public_pem);
 
     let certmgr = tt_rs::stdimpl::local_certmgr::LocalCertMgr{};
-    hivemind.set(format!("{}",root_cert.id.clone()), serde_json::to_string(&root_cert).unwrap());
+    hivemind.set(format!("{}",root_cert.certificate.id.clone()), serde_json::to_string(&root_cert.certificate).unwrap());
 
     let res = certmgr.request_certificate(SignedCertificateRequest{
         requested_by: "root".to_string(),
