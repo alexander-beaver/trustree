@@ -68,7 +68,15 @@ pub struct IssuedCertificate{
     pub signature: String,
 }
 
-
+pub fn issued_certificate_to_certificate(issued_certificate: IssuedCertificate) -> Certificate{
+    Certificate{
+        id: issued_certificate.id,
+        issued_by: issued_certificate.issued_by,
+        issues: vec![],
+        public_key: issued_certificate.public_key,
+        timestamp_expires: issued_certificate.timestamp_expires,
+    }
+}
 /// Generates a root certificate given a private key and a public key
 pub fn generate_root_certificate(hivemind_origin: String,private_key_pem: String, public_key_pem: String) -> PrivateCertificate{
     let root_cert = Certificate{
