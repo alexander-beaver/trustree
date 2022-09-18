@@ -1,29 +1,35 @@
 use std::fmt;
 use serde::{Serialize, Deserialize};
-use crate::supporting::datastore::hivemind::HiveKey;
+use crate::supporting::datastore::hivemind::{HiveKey, Hivemind};
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CertificateRequest{
     pub issued_by: String,
     pub issued_to: String,
+    pub template: String,
+    pub scope: Vec<String>,
+    pub timestamp_expires: u64,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SignedCertificateRequest{
-    pub issued_by: String,
+    pub requested_by: String,
     pub certificate_request: CertificateRequest,
     pub signature: String,
+    pub associated_public_key: String,
 }
 
 impl SignedCertificateRequest{
 
     /// Validate a certificate request
     pub fn validate(&self) -> bool{
-        if self.issued_by == self.certificate_request.issued_by{
+        if self.requested_by == self.certificate_request.issued_by{
             return true;
         }
         return false;
     }
 }
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Certificate{
     /// The ID of the certificate
     pub id: String,
@@ -41,7 +47,7 @@ pub struct Certificate{
 
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct IssuedCertificate{
     /// The ID of the certificate
     pub id: String,
@@ -75,10 +81,15 @@ pub fn generate_root_certificate(private_key_pem: String, public_key_pem: String
 }
 
 /// The valid responses when a certificate issuance request is submitted to the Certificate Manager
+#[derive(Serialize, Deserialize, Debug)]
 pub enum CertificateIssuanceResponseType{
+    /// The certificate issuance failed for an unknown reason
     Unknown,
+    /// The certificate issuance completed successfully
     Ok,
+    /// The certificate issuance failed because the certificate request was invalid
     InvalidRequest,
+    /// The certificate issuance failed because a chain of trust could not be validated
     InvalidChainOfTrust,
 }
 
@@ -94,14 +105,15 @@ impl fmt::Display for CertificateIssuanceResponseType{
 }
 
 /// A response to a certificate issuance request
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CertificateIssuanceResponse{
     pub response_type: CertificateIssuanceResponseType,
-    pub certificate: String,
+    pub certificate: Option<IssuedCertificate>,
 }
 
 /// A connection to a Certificate Manager
 pub trait CertificateManagerConn {
     /// Request a certificate from the Certificate Manager
-    fn request_certificate(&self, request: SignedCertificateRequest) -> CertificateIssuanceResponse;
+    fn request_certificate<H:Hivemind>(&self, request: SignedCertificateRequest, hivemind: H) -> CertificateIssuanceResponse;
 
 }

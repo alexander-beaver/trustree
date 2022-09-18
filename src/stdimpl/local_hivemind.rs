@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use crate::supporting::datastore::hivemind::Hivemind;
+use crate::supporting::trust::certmgr::SignedCertificateRequest;
 
 pub struct LocalHivemind{
     store: HashMap<String, String>
@@ -30,5 +31,9 @@ impl Hivemind for LocalHivemind{
     }
     fn delete(&mut self, key: String){
         self.store.remove(key.as_str());
+    }
+
+    fn request_issuance(&self, req: SignedCertificateRequest) -> bool {
+        return false;
     }
 }

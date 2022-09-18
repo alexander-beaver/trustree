@@ -3,12 +3,11 @@ use openssl::ecdsa::*;
 
 use openssl::error::ErrorStack;
 use openssl::nid::Nid;
-use openssl::pkey::{PKey, Private, Public};
-use openssl::sign::Signer;
+use openssl::pkey::{Private, Public};
 
 
 fn get_key_group() -> EcGroup {
-    let group = EcGroup::from_curve_name(Nid::X9_62_PRIME256V1).unwrap();
+    let group = EcGroup::from_curve_name(Nid::SECP384R1).unwrap();
     group
 }
 

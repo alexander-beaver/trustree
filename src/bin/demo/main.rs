@@ -16,6 +16,8 @@ fn main() {
     let mut hivemind = LocalHivemind::init();
 
     let root_cert = tt_rs::supporting::trust::certmgr::generate_root_certificate(root_private_pem, root_public_pem);
+
+    let certmgr = tt_rs::stdimpl::local_certmgr::LocalCertMgr{};
     hivemind.set(HiveKey::Cert.to_string(), serde_json::to_string(&root_cert).unwrap());
 
     println!("Root Certificate: {}", serde_json::to_string(&root_cert).unwrap());

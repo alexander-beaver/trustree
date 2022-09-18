@@ -1,4 +1,5 @@
 use std::fmt;
+use crate::supporting::trust::certmgr::SignedCertificateRequest;
 
 pub enum HiveKey {
     Cert,
@@ -26,4 +27,6 @@ pub trait Hivemind {
     fn set(&mut self, key: String, value: String);
     /// Delete a value from the Hivemind
     fn delete(&mut self, key: String);
+
+    fn request_issuance(&self, req: SignedCertificateRequest) -> bool;
 }
