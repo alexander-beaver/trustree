@@ -24,7 +24,7 @@ fn main() {
     hivemind.set(format!("{}",root_cert.certificate.id.clone()), serde_json::to_string(&root_cert.certificate).unwrap());
 
     let res = certmgr.request_certificate(SignedCertificateRequest{
-        requested_by: "root".to_string(),
+        requested_by: "$/CERT/root".to_string(),
         certificate_request: CertificateRequest {
             issued_by: vec!["$/CERT/root".to_string()],
             issued_to: "stage1".to_string(),
@@ -53,6 +53,8 @@ fn main() {
         associated_public_key: "".to_string()
     }, &mut hivemind);
 
-    println!("{:?}", req2);
+    hivemind.set(format!("{}",req2.clone().certificate.clone().unwrap().id.clone()), serde_json::to_string(&req2.clone().certificate.unwrap()).unwrap());
+
+    println!("{:?}", req2.certificate.unwrap());
     println!("Root Certificate: {}", serde_json::to_string(&root_cert).unwrap());
 }

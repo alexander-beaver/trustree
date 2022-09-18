@@ -87,7 +87,7 @@ pub fn generate_root_certificate(hivemind_origin: String,private_key_pem: String
 }
 
 /// The valid responses when a certificate issuance request is submitted to the Certificate Manager
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum CertificateIssuanceResponseType{
     /// The certificate issuance failed for an unknown reason
     Unknown,
@@ -111,7 +111,7 @@ impl fmt::Display for CertificateIssuanceResponseType{
 }
 
 /// A response to a certificate issuance request
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CertificateIssuanceResponse{
     pub response_type: CertificateIssuanceResponseType,
     pub certificate: Option<IssuedCertificate>,

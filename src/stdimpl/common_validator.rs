@@ -16,6 +16,12 @@ pub struct TemplateValidator {}
 impl PolicyValidator for TemplateValidator {
     fn validate(&self, request: SignedCertificateRequest, hivemind: Box<dyn Hivemind>)
         -> PolicyValidatorResponse {
+        if request.certificate_request.template == ""{
+            return PolicyValidatorResponse {
+                vote: Abstain,
+                confidence: 0,
+            };
+        }
         let template = hivemind.get(request.certificate_request.template.clone());
         if template.is_none() {
             return PolicyValidatorResponse {

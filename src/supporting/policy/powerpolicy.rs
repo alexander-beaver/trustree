@@ -22,7 +22,7 @@ impl PolicyValidatorVote{
     /// *false* if it is not valid
     pub fn to_bool(&self) -> bool{
         match self{
-            PolicyValidatorVote::Valid => true,
+            PolicyValidatorVote::Valid   => true,
             PolicyValidatorVote::Invalid => false,
             PolicyValidatorVote::Abstain => false,
             PolicyValidatorVote::Unknown => false,
@@ -32,7 +32,7 @@ impl PolicyValidatorVote{
 impl fmt::Display for PolicyValidatorVote {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            PolicyValidatorVote::Valid => write!(f, "VALID"),
+            PolicyValidatorVote::Valid   => write!(f, "VALID"),
             PolicyValidatorVote::Invalid => write!(f, "INVALID"),
             PolicyValidatorVote::Abstain => write!(f, "ABSTAIN"),
             PolicyValidatorVote::Unknown => write!(f, "UNKNOWN"),
