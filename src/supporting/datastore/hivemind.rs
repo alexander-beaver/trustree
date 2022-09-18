@@ -29,4 +29,6 @@ pub trait Hivemind {
     fn delete(&mut self, key: String);
 
     fn request_issuance(&self, req: SignedCertificateRequest) -> bool;
+
+    fn get_hivemind_path(&self) -> String;
 }

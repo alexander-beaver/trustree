@@ -4,7 +4,11 @@ use crate::supporting::datastore::hivemind::{HiveKey, Hivemind};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CertificateRequest{
-    pub issued_by: String,
+    /// The issuer of this certificate
+    ///
+    /// This is a list of HiveKeys that are used to form the trust
+    /// The first key is the root key, and the last key is the issuer
+    pub issued_by: Vec<String>,
     pub issued_to: String,
     pub template: String,
     pub scope: Vec<String>,
@@ -23,7 +27,7 @@ impl SignedCertificateRequest{
 
     /// Validate a certificate request
     pub fn validate(&self) -> bool{
-        if self.requested_by == self.certificate_request.issued_by{
+        if self.requested_by == self.certificate_request.issued_by[0]{
             return true;
         }
         return false;
@@ -67,9 +71,9 @@ pub struct IssuedCertificate{
 
 
 /// Generates a root certificate given a private key and a public key
-pub fn generate_root_certificate(private_key_pem: String, public_key_pem: String) -> Certificate{
+pub fn generate_root_certificate(hivemind_origin: String,private_key_pem: String, public_key_pem: String) -> Certificate{
     let root_cert = Certificate{
-        id: format!("{}/root",HiveKey::Cert).to_string(),
+        id: format!("{}/{}/root", hivemind_origin, HiveKey::Cert).to_string(),
         issued_by: vec![],
         issues: vec![],
         public_key: public_key_pem,
@@ -114,6 +118,6 @@ pub struct CertificateIssuanceResponse{
 /// A connection to a Certificate Manager
 pub trait CertificateManagerConn {
     /// Request a certificate from the Certificate Manager
-    fn request_certificate<H:Hivemind>(&self, request: SignedCertificateRequest, hivemind: H) -> CertificateIssuanceResponse;
+    fn request_certificate<H:Hivemind>(&self, request: SignedCertificateRequest, hivemind: &mut H) -> CertificateIssuanceResponse;
 
 }

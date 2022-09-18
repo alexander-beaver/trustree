@@ -36,4 +36,8 @@ impl Hivemind for LocalHivemind{
     fn request_issuance(&self, req: SignedCertificateRequest) -> bool {
         return true;
     }
+
+    fn get_hivemind_path(&self) -> String {
+        return "$".to_string();
+    }
 }
