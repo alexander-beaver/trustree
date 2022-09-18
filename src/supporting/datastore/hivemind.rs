@@ -1,7 +1,37 @@
+use std::fmt;
+use crate::supporting::policy::powerpolicy::PolicyValidator;
+use crate::supporting::trust::certmgr::SignedCertificateRequest;
+
+pub enum HiveKey {
+    Cert,
+    Template
+}
+
+impl fmt::Display for HiveKey {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            HiveKey::Cert => write!(f, "CERT"),
+            HiveKey::Template => write!(f, "TEMPLATE"),
+        }
+    }
+}
+
+/// Standard implementation for a Hivemind connection
 pub trait Hivemind {
+    /// Initialize the Hivemind connection
     fn init(&self) -> bool;
-    fn exists(&self, key: &str) -> bool;
-    fn get(&self, key: &str) -> Option<String>;
-    fn set(&mut self, key: &str, value: &str);
-    fn delete(&mut self, key: &str);
+    /// Check if a key exists in the Hivemind
+    fn exists(&self, key: String) -> bool;
+    /// Get a value from the Hivemind
+    fn get(&self, key: String) -> Option<String>;
+    /// Set a value in the Hivemind
+    fn set(&mut self, key: String, value: String);
+    /// Delete a value from the Hivemind
+    fn delete(&mut self, key: String);
+
+    fn request_issuance(&self, req: SignedCertificateRequest) -> bool;
+
+    fn get_hivemind_path(&self) -> String;
+
+    fn get_validators(&self) -> Vec<Box<dyn PolicyValidator>>;
 }

@@ -1,43 +1,46 @@
+use std::collections::HashMap;
+use crate::stdimpl::common_validator::{ChainOfTrustValidator, TemplateValidator};
 use crate::supporting::datastore::hivemind::Hivemind;
+use crate::supporting::policy::powerpolicy::PolicyValidator;
+use crate::supporting::trust::certmgr::SignedCertificateRequest;
 
-struct LocalHivemind{
-    directory: String,
+pub struct LocalHivemind{
+    pub store: HashMap<String, String>
 }
 impl LocalHivemind{
 
 }
-fn dir_exists(folder: String) -> bool{
-    return std::path::Path::new(&format!("{}", folder)).is_dir();
-}
+
 impl Hivemind for LocalHivemind{
-    fn init(&self) -> bool{
-        // Create all folders to the directory if they do not exist
-        if dir_exists(self.directory.clone()){
-            std::fs::create_dir_all(self.directory.clone()).expect("Unable to create directory");
-
-        }
+    fn init(&self) -> bool {
         return true;
-
+    }
+    fn exists(&self, key: String) -> bool {
+        return self.store.contains_key(key.as_str());
     }
 
-    fn exists(&self, key: &str) -> bool {
-        return std::path::Path::new(&format!("{}/{}", self.directory, key)).exists();
-    }
-
-    fn get(&self, key: &str) -> Option<String> {
-        if self.exists(key){
-            let contents = std::fs::read_to_string(&format!("{}/{}", self.directory, key)).expect("Unable to read file");
-            return Some(contents);
-        }else{
-            return None;
+    fn get(&self, key: String) -> Option<String>{
+        if self.exists(key.clone()){
+            return Some(self.store.get(key.as_str()).unwrap().to_string());
         }
+        return None;
+
+    }
+    fn set(&mut self, key: String, value: String){
+        self.store.insert(key.parse().unwrap(), value.parse().unwrap());
+    }
+    fn delete(&mut self, key: String){
+        self.store.remove(key.as_str());
     }
 
-    fn set(&mut self, key: &str, value: &str) {
-        std::fs::write(&format!("{}/{}", self.directory, key), value).expect("Unable to write file");
+    fn request_issuance(&self, req: SignedCertificateRequest) -> bool {
+        return true;
     }
 
-    fn delete(&mut self, key: &str) {
-        std::fs::remove_file(&format!("{}/{}", self.directory, key)).expect("Unable to delete file");
+    fn get_hivemind_path(&self) -> String {
+        return "$".to_string();
+    }
+    fn get_validators(&self) -> Vec<Box<dyn PolicyValidator>> {
+        return vec![Box::new(TemplateValidator{}), Box::new(ChainOfTrustValidator{})];
     }
 }
