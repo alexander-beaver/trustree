@@ -55,7 +55,9 @@ pub trait PolicyValidator {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct PolicyTemplate {}
+pub struct PolicyTemplate {
+
+}
 
 pub enum PolicyTemplateValidationMethod {
     /// It must match direct string equality

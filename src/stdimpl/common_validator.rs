@@ -34,6 +34,7 @@ impl PolicyValidator for TemplateValidator {
 
         let parsed_template: PolicyTemplate = serde_json::from_str(&template.as_str()).unwrap();
 
+
         return PolicyValidatorResponse {
             vote: Valid,
             confidence: 1000,

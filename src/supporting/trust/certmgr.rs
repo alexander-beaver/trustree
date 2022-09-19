@@ -9,9 +9,13 @@ pub struct CertificateRequest {
     /// This is a list of HiveKeys that are used to form the trust
     /// The first key is the root key, and the last key is the issuer
     pub issued_by: Vec<String>,
+    /// The subject of this certificate (hivemind path)
     pub issued_to: String,
+    /// The template to use for this certificate
     pub template: String,
+    /// The scope of this certificate
     pub scope: Vec<String>,
+    /// The timestamp that this certificate expires
     pub timestamp_expires: u64,
 }
 

@@ -5,6 +5,9 @@ use std::fmt;
 pub enum HiveKey {
     Cert,
     Template,
+    Policy,
+    Node,
+    Actor
 }
 
 impl fmt::Display for HiveKey {
@@ -12,6 +15,9 @@ impl fmt::Display for HiveKey {
         match *self {
             HiveKey::Cert => write!(f, "CERT"),
             HiveKey::Template => write!(f, "TEMPLATE"),
+            HiveKey::Policy => write!(f, "POLICY"),
+            HiveKey::Node => write!(f, "NODE"),
+            HiveKey::Actor => write!(f, "ACTOR"),
         }
     }
 }
