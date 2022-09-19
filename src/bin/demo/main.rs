@@ -99,7 +99,6 @@ fn main() {
     );
     println!("{:?}", res);
 
-
     let cert3 = res.clone().certificate;
     if cert3.is_none() {
         println!("Certificate 3 is none");

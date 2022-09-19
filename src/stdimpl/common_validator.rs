@@ -11,7 +11,9 @@ use crate::supporting::policy::powerpolicy::PolicyValidatorVote::{Abstain, Inval
 use crate::supporting::policy::powerpolicy::{
     PolicyTemplate, PolicyValidator, PolicyValidatorResponse,
 };
-use crate::supporting::trust::certmgr::{Certificate, CertificateRequest, SignedCertificateRequest};
+use crate::supporting::trust::certmgr::{
+    Certificate, CertificateRequest, SignedCertificateRequest,
+};
 
 pub struct TemplateValidator {}
 
@@ -72,7 +74,7 @@ impl PolicyValidator for ChainOfTrustValidator {
             let cert = cert.unwrap();
 
             let parsed_cert: Certificate = serde_json::from_str(cert.as_str()).unwrap();
-            if parsed_cert.id == "$/CERT/root"{
+            if parsed_cert.id == "$/CERT/root" {
                 // TODO Implement boottime protection
                 return PolicyValidatorResponse {
                     vote: Valid,
@@ -91,7 +93,10 @@ impl PolicyValidator for ChainOfTrustValidator {
             let issuer_cert = Certificate::from_json(issuer_cert);
             if !verify_signature(
                 convert_pem_to_public_key(issuer_cert.public_key.clone()),
-                serde_json::to_string(&CertificateRequest::from_certificate(parsed_cert.clone())).unwrap().as_bytes().to_vec(),
+                serde_json::to_string(&CertificateRequest::from_certificate(parsed_cert.clone()))
+                    .unwrap()
+                    .as_bytes()
+                    .to_vec(),
                 ecdsa_from_string(parsed_cert.signature.clone()),
             ) {
                 return PolicyValidatorResponse {

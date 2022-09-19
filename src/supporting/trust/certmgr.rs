@@ -17,9 +17,9 @@ pub struct CertificateRequest {
     pub timestamp_expires: u64,
 }
 
-impl CertificateRequest{
-    pub fn from_certificate(certificate: Certificate) -> CertificateRequest{
-        CertificateRequest{
+impl CertificateRequest {
+    pub fn from_certificate(certificate: Certificate) -> CertificateRequest {
+        CertificateRequest {
             issued_by: certificate.issued_by,
             issued_to: certificate.issued_to,
             template: certificate.template,

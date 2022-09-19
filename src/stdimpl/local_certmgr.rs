@@ -46,7 +46,6 @@ impl CertificateManagerConn for LocalCertMgr {
                 template: request.certificate_request.template,
                 scope: request.certificate_request.scope,
                 issued_to: request.certificate_request.issued_to,
-
             };
             hivemind.set(cert.clone().id, cert.clone().to_json());
             return CertificateIssuanceResponse {
