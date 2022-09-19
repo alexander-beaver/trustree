@@ -15,6 +15,7 @@ pub fn generate_signed_certificate_request(
     issuing_certificate: PrivateCertificate,
     public_key: String,
     template: String,
+    permissions: Vec<String>,
     scope: Vec<String>,
     ttl: u64,
 ) -> SignedCertificateRequest {
@@ -24,8 +25,9 @@ pub fn generate_signed_certificate_request(
     let cr = CertificateRequest {
         issued_by: issuer,
         issued_to: "".to_string(),
-        template: template,
-        scope: vec![],
+        template,
+        permissions,
+        scope,
         timestamp_expires: chrono::Utc::now().timestamp() as u64 + (ttl as u64),
     };
 

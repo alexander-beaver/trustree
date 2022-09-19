@@ -44,6 +44,7 @@ impl CertificateManagerConn for LocalCertMgr {
                 data: serde_json::to_string(&request.clone().certificate_request).unwrap(),
                 signature: request.signature,
                 template: request.certificate_request.template,
+                permissions: request.certificate_request.permissions,
                 scope: request.certificate_request.scope,
                 issued_to: request.certificate_request.issued_to,
             };

@@ -1,4 +1,3 @@
-pub mod anchor;
 pub mod certmgr;
 
 /// Have a way to numerically compare the security level of different policies

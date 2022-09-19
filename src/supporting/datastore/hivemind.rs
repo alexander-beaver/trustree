@@ -39,5 +39,5 @@ pub trait Hivemind {
 
     fn get_hivemind_path(&self) -> String;
 
-    fn get_validators(&self) -> Vec<Box<dyn PolicyValidator>>;
+    fn get_validators(&self) -> Vec<&dyn PolicyValidator>;
 }
