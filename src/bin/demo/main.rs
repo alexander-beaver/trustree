@@ -1,58 +1,111 @@
 extern crate core;
 
-
-use std::collections::HashMap;
 use openssl::base64;
-use tt_rs::crypto::ecdsa::{generate_keypair, sign_data};
-use tt_rs::supporting::ux::default_prints::print_copyright;
+use std::collections::HashMap;
+use tt_rs::client::generate_signed_certificate_request;
+use tt_rs::crypto::ecdsa::{
+    generate_keypair, get_pem_from_private_key, get_pem_from_public_key, sign_data,
+};
 use tt_rs::stdimpl::local_hivemind::LocalHivemind;
 use tt_rs::supporting::datastore::hivemind::{HiveKey, Hivemind};
-use tt_rs::supporting::trust::certmgr::{CertificateManagerConn, CertificateRequest, SignedCertificateRequest};
+use tt_rs::supporting::trust::certmgr::{
+    CertificateManagerConn, CertificateRequest, PrivateCertificate, SignedCertificateRequest,
+};
+use tt_rs::supporting::ux::default_prints::print_copyright;
 
 fn main() {
     print_copyright();
     let (root_private_key, root_public_key) = generate_keypair();
-    let root_private_pem = base64::encode_block(root_private_key.private_key_to_pem().unwrap().as_slice());
-    let root_public_pem = base64::encode_block(root_public_key.public_key_to_pem().unwrap().as_slice());
+    let root_private_pem = get_pem_from_private_key(root_private_key);
+    let root_public_pem = get_pem_from_public_key(root_public_key);
 
-    let mut hivemind = LocalHivemind{store: HashMap::new()};
+    let mut hivemind = LocalHivemind {
+        store: HashMap::new(),
+    };
     LocalHivemind::init(&hivemind);
 
-    let root_cert = tt_rs::supporting::trust::certmgr::generate_root_certificate(String::from("$"),root_private_pem, root_public_pem);
+    let root_cert = tt_rs::supporting::trust::certmgr::generate_root_certificate(
+        String::from("$"),
+        root_private_pem,
+        root_public_pem,
+    );
 
-    let certmgr = tt_rs::stdimpl::local_certmgr::LocalCertMgr{};
-    hivemind.set(format!("{}",root_cert.id.clone()), serde_json::to_string(&root_cert).unwrap());
+    let certmgr = tt_rs::stdimpl::local_certmgr::LocalCertMgr {};
+    hivemind.set(
+        format!("{}", root_cert.certificate.id.clone()),
+        serde_json::to_string(&root_cert.certificate).unwrap(),
+    );
 
-    let res = certmgr.request_certificate(SignedCertificateRequest{
-        requested_by: "root".to_string(),
-        certificate_request: CertificateRequest {
-            issued_by: vec!["$/CERT/root".to_string()],
-            issued_to: "stage1".to_string(),
-            template: "".to_string(),
-            scope: vec!["*".to_string()],
-            timestamp_expires: 0,
-        },
-        signature: "".to_string(),
-        associated_public_key: "".to_string()
-    }, &mut hivemind);
+    let (crt_1_private, crt_1_public) = generate_keypair();
+    let res = certmgr.request_certificate(
+        generate_signed_certificate_request(
+            root_cert.clone(),
+            get_pem_from_public_key(crt_1_public.clone()),
+            "".to_string(),
+            vec![],
+            60 * 60,
+        ),
+        &mut hivemind,
+    );
 
     println!("{:?}", res);
 
-    let cert1 = res.certificate.unwrap();
-    hivemind.set(format!("{}",cert1.id.clone()), serde_json::to_string(&cert1).unwrap());
-    let req2 = certmgr.request_certificate(SignedCertificateRequest{
-        requested_by: cert1.issued_by.last().unwrap().clone(),
-        certificate_request: CertificateRequest {
-            issued_by: vec!["$/CERT/root".to_string(), cert1.id.clone()],
-            issued_to: "stage2".to_string(),
-            template: "".to_string(),
-            scope: vec!["*".to_string()],
-            timestamp_expires: 0,
-        },
-        signature: "".to_string(),
-        associated_public_key: "".to_string()
-    }, &mut hivemind);
+    let cert1 = res.certificate;
+    if cert1.is_none() {
+        println!("Certificate 1 is none");
+        return;
+    }
+    let cert1 = cert1.unwrap();
 
-    println!("{:?}", req2);
-    println!("Root Certificate: {}", serde_json::to_string(&root_cert).unwrap());
+    let cert1_private_cert = PrivateCertificate {
+        private_key: get_pem_from_private_key(crt_1_private.clone()),
+        certificate: cert1.clone(),
+    };
+
+    let (crt_2_private, crt_2_public) = generate_keypair();
+    let res = certmgr.request_certificate(
+        generate_signed_certificate_request(
+            cert1_private_cert,
+            get_pem_from_public_key(crt_2_public),
+            "".to_string(),
+            vec![],
+            60 * 60,
+        ),
+        &mut hivemind,
+    );
+    println!("{:?}", res);
+
+    let cert2 = res.clone().certificate;
+
+    if cert2.is_none() {
+        println!("Certificate 2 is none");
+        return;
+    }
+    let cert2 = cert2.unwrap();
+    let cert2_private_cert = PrivateCertificate {
+        private_key: get_pem_from_private_key(crt_2_private.clone()),
+        certificate: cert2.clone(),
+    };
+    let (crt_3_private, crt_3_public) = generate_keypair();
+    let res = certmgr.request_certificate(
+        generate_signed_certificate_request(
+            cert2_private_cert,
+            get_pem_from_public_key(crt_3_public),
+            "".to_string(),
+            vec![],
+            60 * 60,
+        ),
+        &mut hivemind,
+    );
+    println!("{:?}", res);
+
+    let cert3 = res.clone().certificate;
+    if cert3.is_none() {
+        println!("Certificate 3 is none");
+        return;
+    }
+    let cert3 = cert3.unwrap();
+    println!("Cert 3: {}", cert3.id);
+
+    println!("{:?}", res);
 }
