@@ -111,7 +111,6 @@ fn main() {
         ),
         &mut hivemind,
     );
-    println!("{:?}", res);
 
     let cert3 = res.clone().certificate;
     if cert3.is_none() {
