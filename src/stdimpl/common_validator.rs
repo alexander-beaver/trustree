@@ -1,4 +1,3 @@
-
 use crate::crypto::ecdsa::{convert_pem_to_public_key, ecdsa_from_string, verify_signature};
 use crate::supporting::datastore::hivemind::Hivemind;
 use crate::supporting::policy::powerpolicy::PolicyValidatorVote::{Abstain, Invalid, Valid};
@@ -10,8 +9,12 @@ use crate::supporting::trust::certmgr::{
 };
 
 pub struct DerivedValidator {}
-impl PolicyValidator for DerivedValidator{
-    fn validate(&self, request: SignedCertificateRequest, hivemind: &Hivemind) -> PolicyValidatorResponse {
+impl PolicyValidator for DerivedValidator {
+    fn validate(
+        &self,
+        request: SignedCertificateRequest,
+        hivemind: &Hivemind,
+    ) -> PolicyValidatorResponse {
         let mut keys = request.clone().certificate_request.issued_by;
         keys.reverse();
         let keys_length = keys.len();
@@ -47,9 +50,9 @@ impl PolicyValidator for DerivedValidator{
             }
             let issuer_cert = issuer_cert.unwrap();
             let issuer_cert = Certificate::from_json(issuer_cert);
-            for permission in parsed_cert.permissions{
+            for permission in parsed_cert.permissions {
                 let is_in_issuer = issuer_cert.permissions.contains(&permission);
-                if !is_in_issuer{
+                if !is_in_issuer {
                     return PolicyValidatorResponse {
                         vote: Invalid,
                         confidence: 1000,
@@ -68,7 +71,6 @@ impl PolicyValidator for DerivedValidator{
             vote: Invalid,
             confidence: 1000,
         };
-
     }
 }
 pub struct TemplateValidator {}
@@ -95,7 +97,6 @@ impl PolicyValidator for TemplateValidator {
         let template = template.unwrap();
 
         let parsed_template: PolicyTemplate = serde_json::from_str(&template.as_str()).unwrap();
-
 
         return PolicyValidatorResponse {
             vote: Valid,

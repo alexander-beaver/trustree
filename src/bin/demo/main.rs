@@ -2,14 +2,10 @@ extern crate core;
 
 use std::collections::HashMap;
 use tt_rs::client::generate_signed_certificate_request;
-use tt_rs::crypto::ecdsa::{
-    generate_keypair, get_pem_from_private_key, get_pem_from_public_key
-};
+use tt_rs::crypto::ecdsa::{generate_keypair, get_pem_from_private_key, get_pem_from_public_key};
 use tt_rs::stdimpl::local_hivemind::LocalHivemind;
 use tt_rs::supporting::datastore::hivemind::{HiveKey, Hivemind};
-use tt_rs::supporting::trust::certmgr::{
-    CertificateManagerConn, PrivateCertificate,
-};
+use tt_rs::supporting::trust::certmgr::{CertificateManagerConn, PrivateCertificate};
 use tt_rs::supporting::ux::default_prints::print_copyright;
 
 fn main() {
@@ -27,8 +23,18 @@ fn main() {
         String::from("$"),
         root_private_pem,
         root_public_pem,
-        vec!["PermA".to_string(),"PermB".to_string(), "PermC".to_string(), "PermD".to_string()],
-        vec!["RoleA".to_string(),"RoleB".to_string(), "RoleC".to_string(), "RoleD".to_string()],
+        vec![
+            "PermA".to_string(),
+            "PermB".to_string(),
+            "PermC".to_string(),
+            "PermD".to_string(),
+        ],
+        vec![
+            "RoleA".to_string(),
+            "RoleB".to_string(),
+            "RoleC".to_string(),
+            "RoleD".to_string(),
+        ],
     );
 
     let certmgr = tt_rs::stdimpl::local_certmgr::LocalCertMgr {};
@@ -39,7 +45,18 @@ fn main() {
 
     let (crt_1_private, crt_1_public) = generate_keypair();
     let res = certmgr.request_certificate(
-        generate_signed_certificate_request(root_cert.clone(), get_pem_from_public_key(crt_1_public.clone()), "".to_string(), vec!["PermA".to_string(),"PermB".to_string(), "PermC".to_string()], vec![], 60 * 60),
+        generate_signed_certificate_request(
+            root_cert.clone(),
+            get_pem_from_public_key(crt_1_public.clone()),
+            "".to_string(),
+            vec![
+                "PermA".to_string(),
+                "PermB".to_string(),
+                "PermC".to_string(),
+            ],
+            vec![],
+            60 * 60,
+        ),
         &mut hivemind,
     );
 
@@ -59,7 +76,14 @@ fn main() {
 
     let (crt_2_private, crt_2_public) = generate_keypair();
     let res = certmgr.request_certificate(
-        generate_signed_certificate_request(cert1_private_cert, get_pem_from_public_key(crt_2_public), "".to_string(), vec!["PermA".to_string(),"PermB".to_string()], vec![],60 * 60),
+        generate_signed_certificate_request(
+            cert1_private_cert,
+            get_pem_from_public_key(crt_2_public),
+            "".to_string(),
+            vec!["PermA".to_string(), "PermB".to_string()],
+            vec![],
+            60 * 60,
+        ),
         &mut hivemind,
     );
     println!("{:?}", res);
@@ -77,7 +101,14 @@ fn main() {
     };
     let (crt_3_private, crt_3_public) = generate_keypair();
     let res = certmgr.request_certificate(
-        generate_signed_certificate_request(cert2_private_cert, get_pem_from_public_key(crt_3_public), "".to_string(), vec!["PermA".to_string()], vec![],60 * 60),
+        generate_signed_certificate_request(
+            cert2_private_cert,
+            get_pem_from_public_key(crt_3_public),
+            "".to_string(),
+            vec!["PermA".to_string()],
+            vec![],
+            60 * 60,
+        ),
         &mut hivemind,
     );
     println!("{:?}", res);

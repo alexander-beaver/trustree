@@ -7,7 +7,7 @@ pub enum HiveKey {
     Template,
     Policy,
     Node,
-    Actor
+    Actor,
 }
 
 impl fmt::Display for HiveKey {

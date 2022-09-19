@@ -1,4 +1,6 @@
-use crate::stdimpl::common_validator::{ChainOfTrustValidator, DerivedValidator, TemplateValidator};
+use crate::stdimpl::common_validator::{
+    ChainOfTrustValidator, DerivedValidator, TemplateValidator,
+};
 use crate::supporting::datastore::hivemind::Hivemind;
 use crate::supporting::policy::powerpolicy::{PolicyValidator, PolicyValidatorVote};
 use crate::supporting::trust::certmgr::SignedCertificateRequest;
@@ -52,7 +54,7 @@ impl Hivemind for LocalHivemind {
         return vec![
             &TemplateValidator {},
             &ChainOfTrustValidator {},
-            &DerivedValidator {}
+            &DerivedValidator {},
         ];
     }
 }
