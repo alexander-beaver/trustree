@@ -1,16 +1,11 @@
 extern crate core;
 
-use openssl::base64;
 use std::collections::HashMap;
 use tt_rs::client::generate_signed_certificate_request;
-use tt_rs::crypto::ecdsa::{
-    generate_keypair, get_pem_from_private_key, get_pem_from_public_key, sign_data,
-};
+use tt_rs::crypto::ecdsa::{generate_keypair, get_pem_from_private_key, get_pem_from_public_key};
 use tt_rs::stdimpl::local_hivemind::LocalHivemind;
 use tt_rs::supporting::datastore::hivemind::{HiveKey, Hivemind};
-use tt_rs::supporting::trust::certmgr::{
-    CertificateManagerConn, CertificateRequest, PrivateCertificate, SignedCertificateRequest,
-};
+use tt_rs::supporting::trust::certmgr::{CertificateManagerConn, PrivateCertificate};
 use tt_rs::supporting::ux::default_prints::print_copyright;
 
 fn main() {
@@ -28,6 +23,18 @@ fn main() {
         String::from("$"),
         root_private_pem,
         root_public_pem,
+        vec![
+            "PermA".to_string(),
+            "PermB".to_string(),
+            "PermC".to_string(),
+            "PermD".to_string(),
+        ],
+        vec![
+            "RoleA".to_string(),
+            "RoleB".to_string(),
+            "RoleC".to_string(),
+            "RoleD".to_string(),
+        ],
     );
 
     let certmgr = tt_rs::stdimpl::local_certmgr::LocalCertMgr {};
@@ -42,6 +49,11 @@ fn main() {
             root_cert.clone(),
             get_pem_from_public_key(crt_1_public.clone()),
             "".to_string(),
+            vec![
+                "PermA".to_string(),
+                "PermB".to_string(),
+                "PermC".to_string(),
+            ],
             vec![],
             60 * 60,
         ),
@@ -68,6 +80,7 @@ fn main() {
             cert1_private_cert,
             get_pem_from_public_key(crt_2_public),
             "".to_string(),
+            vec!["PermA".to_string(), "PermB".to_string()],
             vec![],
             60 * 60,
         ),
@@ -92,6 +105,7 @@ fn main() {
             cert2_private_cert,
             get_pem_from_public_key(crt_3_public),
             "".to_string(),
+            vec!["PermA".to_string()],
             vec![],
             60 * 60,
         ),

@@ -1,6 +1,4 @@
 use crate::supporting::datastore::hivemind::{HiveKey, Hivemind};
-use openssl::ec::EcKey;
-use openssl::pkey::Private;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -11,9 +9,16 @@ pub struct CertificateRequest {
     /// This is a list of HiveKeys that are used to form the trust
     /// The first key is the root key, and the last key is the issuer
     pub issued_by: Vec<String>,
+    /// The subject of this certificate (hivemind path)
     pub issued_to: String,
+    /// The template to use for this certificate
     pub template: String,
+    /// The scope of this certificate
     pub scope: Vec<String>,
+
+    /// The hivekeys for the permissions that this certificate has
+    pub permissions: Vec<String>,
+    /// The timestamp that this certificate expires
     pub timestamp_expires: u64,
 }
 
@@ -24,6 +29,7 @@ impl CertificateRequest {
             issued_to: certificate.issued_to,
             template: certificate.template,
             scope: certificate.scope,
+            permissions: certificate.permissions,
             timestamp_expires: certificate.timestamp_expires,
         }
     }
@@ -66,6 +72,8 @@ pub struct Certificate {
     pub template: String,
     /// The scope of the certificate
     pub scope: Vec<String>,
+    /// The hivekeys for the permissions that this certificate has
+    pub permissions: Vec<String>,
 }
 
 impl Certificate {
@@ -82,6 +90,8 @@ pub fn generate_root_certificate(
     hivemind_origin: String,
     private_key_pem: String,
     public_key_pem: String,
+    permissions: Vec<String>,
+    scope: Vec<String>,
 ) -> PrivateCertificate {
     let root_cert = Certificate {
         id: format!("{}/{}/root", hivemind_origin, HiveKey::Cert).to_string(),
@@ -92,7 +102,8 @@ pub fn generate_root_certificate(
         data: "".to_string(),
         signature: "".to_string(),
         template: "root".to_string(),
-        scope: vec![],
+        scope,
+        permissions,
         issued_to: "*".to_string(),
     };
 
