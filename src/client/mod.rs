@@ -2,7 +2,6 @@ use crate::crypto::ecdsa::{convert_pem_to_private_key, ecdsa_to_string, sign_dat
 use crate::supporting::trust::certmgr::{
     CertificateRequest, PrivateCertificate, SignedCertificateRequest,
 };
-use openssl::base64;
 
 /// Generate a request for a certificate given a previous certificate
 ///

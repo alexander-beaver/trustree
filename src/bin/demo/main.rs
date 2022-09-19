@@ -1,15 +1,14 @@
 extern crate core;
 
-use openssl::base64;
 use std::collections::HashMap;
 use tt_rs::client::generate_signed_certificate_request;
 use tt_rs::crypto::ecdsa::{
-    generate_keypair, get_pem_from_private_key, get_pem_from_public_key, sign_data,
+    generate_keypair, get_pem_from_private_key, get_pem_from_public_key
 };
 use tt_rs::stdimpl::local_hivemind::LocalHivemind;
 use tt_rs::supporting::datastore::hivemind::{HiveKey, Hivemind};
 use tt_rs::supporting::trust::certmgr::{
-    CertificateManagerConn, CertificateRequest, PrivateCertificate, SignedCertificateRequest,
+    CertificateManagerConn, PrivateCertificate,
 };
 use tt_rs::supporting::ux::default_prints::print_copyright;
 

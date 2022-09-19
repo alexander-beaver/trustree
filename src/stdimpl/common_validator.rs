@@ -1,9 +1,3 @@
-use std::borrow::BorrowMut;
-use std::fmt::Error;
-
-use openssl::base64;
-use openssl::ec::EcKey;
-use openssl::ecdsa::EcdsaSig;
 
 use crate::crypto::ecdsa::{convert_pem_to_public_key, ecdsa_from_string, verify_signature};
 use crate::supporting::datastore::hivemind::Hivemind;

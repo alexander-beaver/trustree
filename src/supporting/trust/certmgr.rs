@@ -1,6 +1,4 @@
 use crate::supporting::datastore::hivemind::{HiveKey, Hivemind};
-use openssl::ec::EcKey;
-use openssl::pkey::Private;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
